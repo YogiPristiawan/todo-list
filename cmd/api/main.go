@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 	"todo-list/internal/shared/databases"
+	"todo-list/internal/shared/databases/migrations"
 
 	"github.com/goccy/go-json"
 	"github.com/pkg/errors"
@@ -78,6 +79,12 @@ func main() {
 			log.Print("error during closing mysql client", errors.WithStack(err))
 		}
 	}(db)
+
+	// MIGRATTIONS
+	err = migrations.Migrate(db)
+	if err != nil {
+		log.Fatal("error during migrating database", errors.WithStack(err))
+	}
 
 	// INITIALIZE REPOSITORIES
 	activityRepoImpl := activityRepo.NewActivity(db)
