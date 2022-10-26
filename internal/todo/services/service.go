@@ -44,8 +44,16 @@ func mapFindAllTodoToResponse(res *[]dto.FindAllTodoResponse, todos []models.Tod
 
 func mapDetailTodoToRespose(res *dto.DetailTodoResponse, todo models.Todo) {
 	res.Id = todo.Id
-	res.Email = todo.Email
+	res.ActivityGroupId = todo.ActivityGroupId
 	res.Title = todo.Title
+	if todo.IsActive.Valid {
+		if todo.IsActive.Bool {
+			res.IsActive = "1"
+		} else {
+			res.IsActive = "0"
+		}
+	}
+	res.Priority = todo.Priority
 	res.CreatedAt = time.Unix(todo.CreatedAt, 0).Format(time.RFC3339)
 	res.UpdatedAt = time.Unix(todo.UpdatedAt, 0).Format(time.RFC3339)
 	if todo.DeletedAt.Valid {
@@ -56,8 +64,16 @@ func mapDetailTodoToRespose(res *dto.DetailTodoResponse, todo models.Todo) {
 
 func mapUpdateTodoToResponse(res *dto.UpdateTodoResponse, todo models.Todo) {
 	res.Id = todo.Id
-	res.Email = todo.Email
+	res.ActivityGroupId = todo.ActivityGroupId
 	res.Title = todo.Title
+	if todo.IsActive.Valid {
+		if todo.IsActive.Bool {
+			res.IsActive = "1"
+		} else {
+			res.IsActive = "0"
+		}
+	}
+	res.Priority = todo.Priority
 	res.CreatedAt = time.Unix(todo.CreatedAt, 0).Format(time.RFC3339)
 	res.UpdatedAt = time.Unix(todo.UpdatedAt, 0).Format(time.RFC3339)
 	if todo.DeletedAt.Valid {

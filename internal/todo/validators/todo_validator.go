@@ -14,11 +14,11 @@ func NewTodo() *todo {
 
 func (t *todo) ValidateCreate(in dto.CreateTodoRequest) error {
 	if in.ActivityGroupId == 0 {
-		return fmt.Errorf("activity group id is required")
+		return fmt.Errorf("activity_group_id cannot be null")
 	}
 
 	if in.Title == "" {
-		return fmt.Errorf("title is required")
+		return fmt.Errorf("title cannot be null")
 	}
 
 	if len(in.Title) > 255 {
@@ -41,11 +41,6 @@ func (t *todo) ValidateCreate(in dto.CreateTodoRequest) error {
 }
 
 func (t *todo) ValidateUpdate(in dto.UpdateTodoRequest) error {
-	// required title
-	if in.Title == "" {
-		return fmt.Errorf("title is requried")
-	}
-
 	if len(in.Title) > 255 {
 		return fmt.Errorf("title too long")
 	}

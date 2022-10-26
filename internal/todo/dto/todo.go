@@ -39,12 +39,14 @@ type DetailTodoRequest struct {
 }
 
 type DetailTodoResponse struct {
-	Id        int64           `json:"id"`
-	Email     string          `json:"emal"`
-	Title     string          `json:"title"`
-	CreatedAt string          `json:"created_at"`
-	UpdatedAt string          `json:"updated_at"`
-	DeletedAt entities.String `json:"deleted_at"`
+	Id              int64           `json:"id"`
+	ActivityGroupId int64           `json:"activity_group_id"`
+	Title           string          `json:"title"`
+	IsActive        string          `json:"is_active"`
+	Priority        string          `json:"priority"`
+	CreatedAt       string          `json:"created_at"`
+	UpdatedAt       string          `json:"updated_at"`
+	DeletedAt       entities.String `json:"deleted_at"`
 }
 
 type UpdateTodoRequest struct {
@@ -56,12 +58,14 @@ type UpdateTodoRequest struct {
 }
 
 type UpdateTodoResponse struct {
-	Id        int64           `json:"id"`
-	Email     string          `json:"email"`
-	Title     string          `json:"title"`
-	CreatedAt string          `json:"created_at"`
-	UpdatedAt string          `json:"udpated_at"`
-	DeletedAt entities.String `json:"deleted_at"`
+	Id              int64           `json:"id"`
+	ActivityGroupId int64           `json:"activity_group_id"`
+	Title           string          `json:"title"`
+	IsActive        string          `json:"is_active"`
+	Priority        string          `json:"priority"`
+	CreatedAt       string          `json:"created_at"`
+	UpdatedAt       string          `json:"udpated_at"`
+	DeletedAt       entities.String `json:"deleted_at"`
 }
 
 type DeleteTodoRequest struct {

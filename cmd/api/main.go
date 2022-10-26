@@ -1,12 +1,15 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
 	"log"
 	"os"
 	"time"
 	"todo-list/internal/shared/databases"
 
 	"github.com/goccy/go-json"
+	"github.com/pkg/errors"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
@@ -27,6 +30,10 @@ import (
 
 // validate env
 func init() {
+	if val, ok := os.LookupEnv("APP_PORT"); val == "" || !ok {
+		log.Fatal("please provide APP_PORT environment variable")
+	}
+
 	if val, ok := os.LookupEnv("MYSQL_USER"); val == "" || !ok {
 		log.Fatal("please provide MYSQL_USER enviroment variable")
 	}
@@ -63,8 +70,14 @@ func main() {
 	// INITIALIZE DATABASES
 	db, err := databases.MySQLConn()
 	if err != nil {
-		log.Fatal("error during connecting to database", err)
+		log.Fatal("error during opening mysql client", err)
 	}
+	defer func(db *sql.DB) {
+		err := db.Close()
+		if err != nil {
+			log.Print("error during closing mysql client", errors.WithStack(err))
+		}
+	}(db)
 
 	// INITIALIZE REPOSITORIES
 	activityRepoImpl := activityRepo.NewActivity(db)
@@ -89,5 +102,5 @@ func main() {
 	activity.NewRoute(app, activityControllerImpl)
 	todo.NewRoute(app, todoControllerImpl)
 
-	app.Listen(":3030")
+	app.Listen(fmt.Sprintf(":%s", os.Getenv("APP_PORT")))
 }

@@ -70,7 +70,6 @@ func (t *todo) DetailTodo(c *fiber.Ctx) error {
 	}
 
 	out := t.service.Detail(in)
-
 	return presentation.WriteRestOutJSON(c, &out, &out.CommonResult)
 }
 

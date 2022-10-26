@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"context"
 	"database/sql"
 	"time"
 	"todo-list/internal/activity/models"
@@ -19,7 +20,7 @@ func NewActivity(
 }
 
 func (a *activity) Create(activity *models.Activity) (err error) {
-	tx, err := a.db.Begin()
+	tx, err := a.db.BeginTx(context.Background(), &sql.TxOptions{})
 	if err != nil {
 		return
 	}
@@ -172,7 +173,7 @@ func (a *activity) Update(id int64, activity *models.Activity) (affected int64, 
 		binds = append(binds, activity.Email)
 	}
 
-	binds = append(binds, now, id)
+	binds = append(binds, id)
 
 	// pass updated data into model's pointer
 	ac.Title = activity.Title

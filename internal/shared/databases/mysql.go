@@ -17,7 +17,10 @@ func MySQLConn() (*sql.DB, error) {
 		os.Getenv("MYSQL_PORT"),
 		os.Getenv("MYSQL_DBNAME"),
 	)
-	return sql.Open("mysql", connURL)
+	db, err := sql.Open("mysql", connURL)
+	db.SetMaxIdleConns(5)
+
+	return db, err
 }
 
 // WrapDBError translate database error

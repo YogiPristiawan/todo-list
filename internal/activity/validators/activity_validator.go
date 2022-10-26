@@ -28,7 +28,7 @@ func (a *activity) ValidateCreate(in dto.CreateActivityRequest) error {
 	}
 
 	if in.Title == "" {
-		return fmt.Errorf("title required")
+		return fmt.Errorf("title cannot be null")
 	}
 
 	if len(in.Title) > 255 {

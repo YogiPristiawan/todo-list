@@ -97,7 +97,6 @@ func (t *todo) FindAll(activityGroupId int64) (todos []models.Todo, err error) {
 
 	sql += ` ORDER BY created_at DESC`
 
-	// fmt.Println(binds)
 	rows, err := t.db.Query(sql, binds...)
 	if err != nil {
 		return
@@ -121,19 +120,20 @@ func (t *todo) FindAll(activityGroupId int64) (todos []models.Todo, err error) {
 func (t *todo) Detail(id int64) (todo models.Todo, err error) {
 	var sql = `
 	SELECT
-		t.id, a.email, t.title, t.created_at, t.updated_at, t.deleted_at
+		id, activity_group_id, title, is_active, priority,
+		created_at, updated_at, deleted_at
 	FROM
-		todos AS t
-		INNER JOIN activities AS a ON a.id = t.activity_group_id
+		todos
 	WHERE
-		t.id = ?
+		id = ?
 		AND
-		t.deleted_at IS NULL
+		deleted_at IS NULL
 	ORDER BY
-		t.created_at DESC`
+		created_at DESC`
 
 	err = t.db.QueryRow(sql, id).Scan(
-		&todo.Id, &todo.Email, &todo.Title, &todo.CreatedAt,
+		&todo.Id, &todo.ActivityGroupId, &todo.Title,
+		&todo.IsActive, &todo.Priority, &todo.CreatedAt,
 		&todo.UpdatedAt, &todo.DeletedAt)
 	return
 }
@@ -142,18 +142,19 @@ func (t *todo) Update(id int64, todo *models.Todo) (affected int64, err error) {
 	// get todo
 	var sql = `
 		SELECT
-			t.id, a.email, t.title, t.created_at, t.updated_at, t.deleted_at
+			id, activity_group_id, title, is_active, priority,
+			created_at, updated_at, deleted_at
 		FROM
-			todos AS t
-			INNER JOIN activities AS a ON a.id = t.activity_group_id
+			todos
 		WHERE
-			t.id = ?
+			id = ?
 			AND
-			t.deleted_at IS NULL`
+			deleted_at IS NULL`
 
 	var td models.Todo
 	err = t.db.QueryRow(sql, id).Scan(
-		&td.Id, &td.Email, &td.Title, &td.CreatedAt, &td.UpdatedAt, &td.DeletedAt)
+		&td.Id, &td.ActivityGroupId, &td.Title, &td.IsActive, &td.Priority,
+		&td.CreatedAt, &td.UpdatedAt, &td.DeletedAt)
 	if err != nil {
 		return
 	}
@@ -161,14 +162,19 @@ func (t *todo) Update(id int64, todo *models.Todo) (affected int64, err error) {
 	sql = `
 		UPDATE todos
 		SET
-			title = ?,
 			updated_at = ?`
 
 	// create timestamps
 	now := time.Now().Unix()
-	var binds = []interface{}{todo.Title, now}
+	var binds = []interface{}{now}
 
 	// optional update
+	if todo.Title != "" {
+		sql += `,title = ?`
+		td.Title = todo.Title
+		binds = append(binds, todo.Title)
+	}
+
 	if todo.ActivityGroupId != 0 {
 		sql += `,activity_group_id = ?`
 		td.ActivityGroupId = todo.ActivityGroupId
@@ -189,7 +195,6 @@ func (t *todo) Update(id int64, todo *models.Todo) (affected int64, err error) {
 
 	binds = append(binds, id)
 
-	td.Title = todo.Title
 	td.UpdatedAt = now
 	*todo = td
 
