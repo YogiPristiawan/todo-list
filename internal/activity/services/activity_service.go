@@ -62,6 +62,7 @@ func (a *activity) Create(in dto.CreateActivityRequest) (out utils.BaseResponse)
 
 	out.Message = "Success"
 	out.Data = res
+	out.SetResponse(201, nil)
 	return
 }
 
@@ -78,12 +79,18 @@ func (a *activity) FindAll() (out utils.BaseResponseArray[dto.FindAllActivitiesR
 		return
 	}
 
+	if len(activities) == 0 {
+		out.Message = "Success"
+		out.Data = []dto.FindAllActivitiesResponse{}
+		out.SetResponse(200, nil)
+		return
+	}
+
 	// map to response
-	res := []dto.FindAllActivitiesResponse{}
-	mapFindAllActivityToResponse(&res, activities)
+	mapFindAllActivityToResponse(&out.Data, activities)
 
 	out.Message = "Success"
-	out.Data = res
+	out.SetResponse(200, nil)
 	return
 }
 

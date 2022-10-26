@@ -20,11 +20,11 @@ type CommonResult struct {
 func (c *CommonResult) SetResponse(code int, err error) {
 	c.code = code
 
-	if code == 200 {
+	if code == 200 || code == 201 {
 		c.Status = "Success"
 	}
 
-	if code > 200 && code < 400 {
+	if code > 201 && code < 400 {
 		c.Status = http.StatusText(code)
 	}
 

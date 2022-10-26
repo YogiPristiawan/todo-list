@@ -37,7 +37,7 @@ func (a *activity) Create(activity *models.Activity) (err error) {
 	// create timestamps
 	now := time.Now().Unix()
 	_, err = tx.Exec(sql,
-		&activity.Title, &activity.Email, now, now,
+		activity.Title, activity.Email, now, now,
 	)
 	if err != nil {
 		if e := tx.Rollback(); e != nil {
@@ -74,7 +74,9 @@ func (a *activity) FindAll() (activities []models.Activity, err error) {
 		FROM
 			activities
 		WHERE
-			deleted_at IS NULL`
+			deleted_at IS NULL
+		ORDER BY
+			created_at DESC`
 
 	rows, err := a.db.Query(sql)
 	if err != nil {
@@ -156,17 +158,20 @@ func (a *activity) Update(id int64, activity *models.Activity) (affected int64, 
 	UPDATE
 		activities
 	SET
-		title = ?,`
-	var binds = []interface{}{activity.Title}
+		title = ?,
+		updated_at = ?`
 
+	// create timestamps
+	now := time.Now().Unix()
+	var binds = []interface{}{activity.Title, now}
+
+	// optional update
 	if activity.Email != "" {
-		updateSql += `email = ?,`
+		updateSql += `,email = ?`
 		ac.Email = activity.Email
 		binds = append(binds, activity.Email)
 	}
 
-	// create timestamps
-	now := time.Now().Unix()
 	binds = append(binds, now, id)
 
 	// pass updated data into model's pointer
@@ -175,11 +180,10 @@ func (a *activity) Update(id int64, activity *models.Activity) (affected int64, 
 	*activity = ac
 
 	updateSql += `
-		updated_at = ?
-	WHERE
-		id = ?
-		AND 
-		deleted_at IS NULL`
+		WHERE
+			id = ?
+			AND 
+			deleted_at IS NULL`
 
 	res, err := a.db.Exec(updateSql, binds...)
 	if err != nil {

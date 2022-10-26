@@ -6,6 +6,10 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+func ReadRestInQuery[T interface{}](c *fiber.Ctx, in *T) error {
+	return c.QueryParser(in)
+}
+
 func ReadRestInParams[T interface{}](c *fiber.Ctx, in *T) error {
 	return c.ParamsParser(in)
 }
